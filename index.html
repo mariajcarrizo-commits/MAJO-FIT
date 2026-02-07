@@ -297,13 +297,16 @@
     </style>
 </head>
 <body>
+    <audio id="alarmSound" preload="auto">
+  <source src="assets/alarm.mp3" type="audio/mpeg">
+</audio>
     <div class="container">
         <h1>MAJO-FIT💋</h1>
         
         <div class="timer-container">
             <h2>⏱️ Temporizador</h2>
             <div class="timer-display" id="timerDisplay">00:00</div>
-            <div class="timer-controls">
+            <div class="timer-controls"> <button class="timer-btn" id="enableSoundBtn">🔊 Activar sonido</button>
                 <button class="timer-btn" id="startBtn">▶️ Iniciar</button>
                 <button class="timer-btn" id="pauseBtn" style="display:none;">⏸️ Pausar</button>
                 <button class="timer-btn" id="resetTimerBtn">🔄 Reiniciar</button>
@@ -655,10 +658,9 @@
                 updateTimerDisplay();
                 
                 if (remainingTime <= 0) {
-                    pauseTimer();
-                    playSound();
-                    alert('⏰ ¡Tiempo terminado!');
-                }
+  pauseTimer();
+  playSound();
+}
             }, 1000);
         }
 
@@ -676,28 +678,26 @@
         }
 
         function playSound() {
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.value = 800;
-                oscillator.type = 'sine';
-                
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-                
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.5);
-            } catch (e) {
-                console.log('Audio not supported');
-            }
-        }
+  const audio = document.getElementById("alarmSound");
+  if (!audio) return;
 
-        document.addEventListener('DOMContentLoaded', function() {
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
+}
+
+        document.addEventListener('DOMContentLoaded', function() {document.getElementById("enableSoundBtn").addEventListener("click", async () => {
+    const audio = document.getElementById("alarmSound");
+    audio.currentTime = 0;
+
+    try {
+        await audio.play();
+        audio.pause();
+        audio.currentTime = 0;
+        alert("✅ Sonido activado");
+    } catch (e) {
+        alert("⚠️ iPhone bloqueó el sonido. Subí el volumen y sacá modo silencio.");
+    }
+});
             loadProgress('lun-mier-vier');
             loadProgress('mar-jue');
 
